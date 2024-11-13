@@ -64,20 +64,14 @@ public class GameMap extends JPanel implements KeyListener {
 			if (dx != -1) { dx = 1; dy = 0;}
 		}
 		
-		
-		// передвижение змеи
-		if (snake.get(0).x > 1 && snake.get(0).x < M) {
-			System.out.println("if x (" + 1 + " - " + snake.get(0).x + " - " + M + ")");
-			if (snake.get(0).y > 1 && snake.get(0).y < H) {
-				System.out.println("(" + 1 + " - " + snake.get(0).y + " - " + N + ")");
+		// передвижение змеи + проверка на столкновение
+		if (this.snake.get(0).x > 1 && this.snake.get(0).x < M) {
+			if (this.snake.get(0).y > 1 && this.snake.get(0).y < N) {
 				snakeMovement(dx, dy);
-			} else {
-				System.out.println("else y (" + 1 + " - " + snake.get(0).y + " - " + N + ")");
 			}
-		} else {
-			System.out.println("else x (" + 1 + " - " + snake.get(0).x + " - " + M + ")");
 		}
 		
+		// рост змеи
 		if (apple.x == snake.get(0).x && apple.y == snake.get(0).y) {
 			snake.add(0, new Tank(apple.x + dx, apple.y + dy));
 			apple.x = Randomizer.getInt(1, M);
