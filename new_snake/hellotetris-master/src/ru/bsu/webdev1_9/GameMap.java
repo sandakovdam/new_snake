@@ -36,6 +36,9 @@ public class GameMap extends JPanel implements KeyListener {
 		this.snake.add(new Tank(20, 20));
 		this.snake.add(new Tank(20, 21));
 		this.snake.add(new Tank(20, 22));
+		for (Tank snake : snake) {
+			snake.setColor(Color.BLUE);
+		}
 
 		this.pressedKeys = new HashMap<Integer, Boolean>();
 		this.pressedKeys.put(KeyEvent.VK_W, false);
@@ -43,7 +46,7 @@ public class GameMap extends JPanel implements KeyListener {
 		this.pressedKeys.put(KeyEvent.VK_S, false);
 		this.pressedKeys.put(KeyEvent.VK_D, false);
 
-		timer = new Timer(1000 / 18, e -> {
+		timer = new Timer(1000 / 1, e -> {
             update();
             repaint();
         });

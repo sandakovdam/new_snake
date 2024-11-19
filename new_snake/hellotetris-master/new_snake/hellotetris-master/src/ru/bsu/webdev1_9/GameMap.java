@@ -15,13 +15,17 @@ public class GameMap extends JPanel implements KeyListener {
 	public static int WIDTH = 600;
 	public static int HEIGHT = 500;
 	public static int H = 10;
-	public static int M = 40;
-	public static int N = 40;
+	public static int M = 40; // up->down
+	public static int N = 40; // left->right
 	protected ArrayList<Tank> snake;
+//	protected Tank head;
 	protected Tank apple;
+	protected int appleCounter;
+	public int rx = 0;
+	public int ry = -1;
 	protected Timer timer;
 	protected HashMap<Integer, Boolean> pressedKeys;
-	// начальное направление змеи
+	// начальное направление змеи - вверх
 	public int dx = 0;
 	public int dy = -1;
 
@@ -30,13 +34,16 @@ public class GameMap extends JPanel implements KeyListener {
 //		this.tank = new Tank(5, M-2);
 //		this.tank.setColor(Color.BLUE);
 		
-		this.apple = new Tank(10, 3);
+		this.apple = new Tank(20, 10);
 		
 		this.snake = new ArrayList<Tank>();
 		this.snake.add(new Tank(20, 20));
 		this.snake.add(new Tank(20, 21));
 		this.snake.add(new Tank(20, 22));
-
+		for (Tank snake : snake) {
+			snake.setColor(Color.BLUE);
+		}
+		
 		this.pressedKeys = new HashMap<Integer, Boolean>();
 		this.pressedKeys.put(KeyEvent.VK_W, false);
 		this.pressedKeys.put(KeyEvent.VK_A, false);
@@ -63,24 +70,37 @@ public class GameMap extends JPanel implements KeyListener {
 		if (pressedKeys.get(KeyEvent.VK_D)) { // right
 			if (dx != -1) { dx = 1; dy = 0;}
 		}
-		
+			
+//		System.out.println("(" + this.snake.get(0).x + ", " + this.snake.get(0).y + ")");
 		// передвижение змеи + проверка на столкновение
 		if (this.snake.get(0).x > 1 && this.snake.get(0).x < M) {
 			if (this.snake.get(0).y > 1 && this.snake.get(0).y < N) {
-				snakeMovement(dx, dy);
+				if (!ouroboros(this.snake.get(0).x, this.snake.get(0).y)) {
+					snakeMovement(dx, dy);
+				} else {
+					timer.stop();
+				}
+			} else {
+				System.out.println("Столкновение со стеной Y");
+				timer.stop();
 			}
+		} else {
+			System.out.println("Столкновение со стеной X");
+			timer.stop();
 		}
 		
 		// рост змеи
 		if (apple.x == snake.get(0).x && apple.y == snake.get(0).y) {
 			snake.add(0, new Tank(apple.x + dx, apple.y + dy));
-			apple.x = Randomizer.getInt(1, M);
-			apple.y = Randomizer.getInt(1, N);
+			snake.get(0).setColor(Color.BLUE);
+			appleCounter++;
+			System.out.println("СЧЕТ: " + appleCounter);
+			appleGeneration();
 		}
 	}
 	
 	//метод для передвижения змеи
-	protected void snakeMovement(int dx, int dy) {
+	private void snakeMovement(int dx, int dy) {
 		
 		for (int i = snake.size() - 1; i >= 1; i-- ) {
 //			System.out.println("(" + "i = " + i + ")");
@@ -89,6 +109,28 @@ public class GameMap extends JPanel implements KeyListener {
 		}
 		snake.get(0).x += dx;
 		snake.get(0).y += dy;
+	}
+	
+	private void appleGeneration() {
+		rx = Randomizer.getInt(2, M-1);
+		ry = Randomizer.getInt(2, N-1);
+		if (!ouroboros(rx, ry)) {
+			apple.x = rx;
+			apple.y = ry;
+		} else {
+			appleGeneration();
+		}
+	}
+	
+	//метод - проверка на столкновение с собой
+	private boolean ouroboros(int x, int y) {
+        for(int i = 1; i < snake.size(); i++){
+            if((snake.get(i).x == x) && (snake.get(i).y == y)) {
+            	System.out.println("Столкновение с собой");
+                return true;
+            }
+        }
+        return false;
 	}
 
 	protected void render(Graphics g) {
@@ -126,12 +168,12 @@ public class GameMap extends JPanel implements KeyListener {
 		// System.out.println(s);
 		
 		int code = e.getKeyCode();
-		System.out.println("keyCode: " + code);
+//		System.out.println("keyCode: " + code);
 
 		switch (code) {
 		case KeyEvent.VK_W:
 			this.pressedKeys.put(KeyEvent.VK_W, true);
-			System.out.println(pressedKeys);
+//			System.out.println(pressedKeys);
 			break;
 		case KeyEvent.VK_A:
 			this.pressedKeys.put(KeyEvent.VK_A, true);
